@@ -249,6 +249,83 @@ marriage(jay,dede,1968).
 divorce(jay,dede,2003).
 
 /*
+Family Relations Revisited
+Consider the knowledge base from exercise 1 from the previous practical class about family
+relations.
+a) Implement the ancestor_of(?X, ?Y) predicate that succeeds if X is an ancestor of Y.
+b) Implement the descendant_of (?X, ?Y) predicate that succeeds if X is a descendent of Y.
+c) Implement the marriage_years(?X, ?Y, -Years) predicate that succeeds if X and Y were married and are now divorced, and determines the marriage duration, in years.
+d) Write queries to answer the following questions:
+    i.      Who is Gloria’s descendant, but not Jay’s? Manny
+    ii.     What ancestors do Haley and Lily have in common? Dede e Jay
+    iii.    To whom were/are both Dede and Gloria married? Jay
+e) Suppose that we now have additional predicates in the knowledge base containing the date of birth of everyone.
+Example:
+born(jay, 1946-5-23).
+born(claire, 1970-11-13).
+born(mitchell, 1973-7-10).
+i. Implement before(+X, +Y), which receives two dates in the format shown above and succeeds if X is before Y.
+ii. Implement older(?X, ?Y, ?Older), which unifies Older with the oldest person between X and Y. If X and Y share the same birthdate, the predicate should fail.
+iii. Implement oldest(?X), which unifies X with the oldest person in the knowledge base.
+*/
+
+born(jay, 1946-5-23).
+born(claire, 1970-11-13).
+born(mitchell, 1973-7-10).
+
+% Implement the ancestor_of(?X, ?Y) predicate that succeeds if X is an ancestor of Y.
+
+ancestor_of(X,Y):-
+    parent(X,Y).
+ancestor_of(X,Y):-
+    parent(X,Z),
+    ancestor_of(Z,Y).
+
+% Implement the descendant_of (?X, ?Y) predicate that succeeds if X is a descendent of Y.
+
+descendant_of(X,Y):-
+    ancestor_of(Y,X).
+
+% Implement the marriage_years(?X, ?Y, -Years) predicate that succeeds if X and Y were married and are now divorced, and determines the marriage duration, in years.
+
+marriage_years(X,Y,YEARS):-
+    marriage(X,Y,Start),
+    divorce(X,Y,End),
+    YEARS is End - Start.
+
+% Implement before(+X, +Y), which receives two dates in the format shown above and succeeds if X is before Y.
+
+before(X,Y):-
+    X = Year1-Month1-Day1,
+    Y = Year2-Month2-Day2,
+    (
+        Year1 < Year2;
+        Year1 = Year2, Month1 < Month2;
+        Year1 = Year2, Month1 = Month2, Day1 < Day2
+    ).
+
+% Implement older(?X, ?Y, ?Older), which unifies Older with the oldest person between X and Y. If X and Y share the same birthdate, the predicate should fail.
+
+older(X,Y,Older):-
+    born(X,DateX),
+    born(Y,DateY),
+    (
+        before(DateX,DateY),
+        Older = X ;
+        before(DateY,DateX),
+        Older = Y 
+    ).
+
+% Implement oldest(?X), which unifies X with the oldest person in the knowledge base.
+
+oldest(X):-
+    born(X,_),
+    \+ (
+        older(X,Y,Y),
+        oldest(Y)
+    ).
+
+/*
 Represent information related to courses, teachers and students, according to the table
 below, using predicates teaches/2 and attends/2, where the first argument of each
 represents the taught or attended course.
@@ -497,6 +574,52 @@ no
 */
 
 /*
+Red Bull Air Race Revisited
+Consider the knowledge base from exercise 3 from the previous practical class about the Red
+Bull Air Race.
+a) Implement the most_gates(?X) predicate, which unifies X with the circuit that has the highest number of gates.
+b) Implement the least_gates(?X) predicate, which unifies X with the circuit that has the lowest number of gates.
+c) Implement the gate_diff(?X) predicate, which unifies X with the difference of gates between the circuits with the highest and lowest number of gates.
+d) Implement same_team(?X, ?Y), which unifies X and Y with pilots racing for the same team.
+e) Implement is_from_winning_team(?P, ?C), which unifies P with a pilot from the same team as the pilot who won circuit C.
+*/
+
+% Implement the most_gates(?X) predicate, which unifies X with the circuit that has the highest number of gates.
+
+most_gates(X):-
+    circuit(X,Gates),
+    \+ (circuit(_,G) , G > Gates).
+
+% Implement the least_gates(?X) predicate, which unifies X with the circuit that has the lowest number of gates.
+
+least_gates(X):-
+    circuit(X,Gates),
+    \+ (circuit(_,G) , G < Gates).
+
+% Implement the gate_diff(?X) predicate, which unifies X with the difference of gates between the circuits with the highest and lowest number of gates.
+
+gate_diff(X):-
+    most_gates(M),
+    least_gates(L),
+    circuit(M,MG),
+    circuit(L,LG),
+    X is MG - LG.
+
+% Implement same_team(?X, ?Y), which unifies X and Y with pilots racing for the same team.
+
+same_team(X,Y):-
+    team(X,TEAM),
+    team(Y,TEAM),
+    dif(X,Y).
+
+% Implement is_from_winning_team(?P, ?C), which unifies P with a pilot from the same team as the pilot who won circuit C.
+
+is_from_winning_team(P,C):-
+    win(P1,C,Team),
+    team(P1,Team),
+    team(P,Team).
+
+/*
 A student used to imperative programming languages is developing a compiler in Prolog.
 One of their tasks consists in translating an error code into a description in English.
 The code they came up with is the following:
@@ -596,3 +719,19 @@ superior_Supervisor(PessoaA,PessoaB):-
     supervised_by(TrabalhoB,TrabalhoC),
     supervised_by(TrabalhoC,TrabalhoA).
 
+/*
+Jobs and Supervisors Revisited
+Consider the knowledge base from exercise 5 from the previous practical class about jobs and supervisors.
+Implement the superior(+X, +Y) predicate, which succeeds if person X occupies a position that is superior to the position occupied by person Y.
+*/
+
+superior(X, Y) :-
+    job(JobX, X),
+    job(JobY, Y),
+    supervised_by(JobY, JobX).
+
+superior(X, Y) :-
+    job(JobY, Y),
+    supervised_by(JobY,JobZ),
+    job(JobZ,Z),
+    superior(X,Z).
