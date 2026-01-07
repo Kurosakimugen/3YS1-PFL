@@ -368,3 +368,231 @@ multicourse(Aluno):-
     attends(Course1,Aluno),
     attends(Course2,Aluno),
     dif(Course1,Course2).
+
+/*
+Represent the following knowledge in Prolog:
+• Lamb, Besenyei, Chambliss, MacLean, Mangold, Jones and Bonhomme are pilots;
+• Lamb is from team Breitling; Besenyei and Chambliss from team Red Bull; MacLean from Mediterranean Racing Team; Mangold from team Cobra; and Jones and Bonhomme from team Matador;
+• Lamb’s pilots an MX2; Besenyei, Chambliss, MacLean, Mangold, Jones and Bonhomme all pilot an Edge540;
+• Istanbul, Budapest and Porto are circuits;
+• Jones won in Porto; Mangold won in Budapest and in Istanbul;
+• Istanbul has 9 gates; Budapest has 6 gates; Porto has 5 gates;
+• A team wins a race when one of its pilots wins that race.
+*/
+
+% Lamb, Besenyei, Chambliss, MacLean, Mangold, Jones and Bonhomme are pilots; pilot/1
+pilot(lamb).
+pilot(besenyei).
+pilot(chambliss).
+pilot(maclean).
+pilot(mangold).
+pilot(jones).
+pilot(bonhomme).
+
+/*
+ Istanbul, Budapest and Porto are circuits;
+ Istanbul has 9 gates; Budapest has 6 gates; Porto has 5 gates;
+ circuit(Name,Gates) circuit/2
+*/
+circuit(istanbul,9).
+circuit(budapest,6).
+circuit(porto,5).
+
+/*  
+    Equipa de cada piloto
+    Lamb is from team Breitling;
+    Besenyei and Chambliss from team Red Bull;
+    MacLean from Mediterranean Racing Team; 
+    Mangold from team Cobra; 
+    and Jones and Bonhomme from team Matador;
+    team(Pilot,Team) team/2
+*/
+
+team(lamb,breitling).
+team(besenyei,red_bull).
+team(chambliss,red_bull).
+team(maclean,mediterranean_racing_team).
+team(mangold,cobra).
+team(jones,matador).
+team(bonhomme,matador).
+
+/*
+    Avião de cada piloto
+    Lamb’s pilots an MX2; 
+    Besenyei, Chambliss, MacLean, Mangold, Jones and Bonhomme all pilot an Edge540;
+    plane(Pilot,Plane) plane/2
+*/
+
+plane(lamb,mx2).
+plane(besenyei,edge540).
+plane(chambliss,edge540).
+plane(maclean,edge540).
+plane(mangold,edge540).
+plane(jones,edge540).
+plane(bonhomme,edge540).
+
+/*
+    Vitórias nos circuitos
+    Jones won in Porto; 
+    Mangold won in Budapest and in Istanbul;
+    A team wins a race when one of its pilots wins that race.
+    win(Pilot,Circuit,Team) win/3
+*/
+
+win(jones,porto,matador).
+win(mangold,budapest,cobra).
+win(mangold,istanbul,cobra).
+
+team_wins(Team,Circuit):-
+    win(Pilot,Circuit,_),
+    team(Pilot,Team).
+
+/*
+Write the following questions in Prolog:
+i. Who won the race in Porto? -> Jones
+win(X,porto,_).
+X = jones ? n
+no
+ii. What team won the race in Porto? -> Matador
+win(_,porto,X).
+X = matador ? n
+no
+iii. Which circuits have nine gates? -> Istambul
+circuit(X,9). 
+X = istanbul ? n
+no
+iv. Which pilots do not fly an Edge540? -> Lamb
+plane(X,Y).
+X = lamb,
+Y = mx2 ? n
+X = besenyei,
+Y = edge540 ? n
+X = chambliss,
+Y = edge540 ? n
+X = maclean,
+Y = edge540 ? n
+X = mangold,
+Y = edge540 ? n
+X = jones,
+Y = edge540 ? n
+X = bonhomme,
+Y = edge540 ? n
+no
+v. Which pilots have won more than one circuit? -> Mangold
+win(X,Y,_).
+X = jones,
+Y = porto ? n
+X = mangold,
+Y = budapest ? n
+X = mangold,
+Y = istanbul ? n
+no
+vi. What is the plane piloted by the pilot who won the race in Porto? -> Edge540
+win(X,porto,_).
+X = jones ? n
+no
+| ?- plane(jones,X).
+X = edge540 ? n
+no
+*/
+
+/*
+A student used to imperative programming languages is developing a compiler in Prolog.
+One of their tasks consists in translating an error code into a description in English.
+The code they came up with is the following:
+translate(Code, Meaning):-
+    Code = 1,
+    Meaning = ‘Integer Overflow’.
+translate(Code, Meaning):-
+    Code = 2,
+    Meaning = ‘Division by zero’.
+translate(Code, Meaning):-
+    Code = 3,
+    Meaning = ‘ID Unknown’.
+As you know, this is not the appropriate way to program in Prolog. Improve on this code.
+*/
+
+translate(1,'Integer Overflow').
+translate(2,'Division by zero').
+translate(3,'ID Unknown').
+
+% Consider the following fact base in Prolog, with predicates job/2 and supervised_by/2:
+
+job(technician, eleuterio).
+job(technician, juvenaldo).
+job(analyst, leonilde).
+job(analyst, marciliano).
+job(engineer, osvaldo).
+job(engineer, porfirio).
+job(engineer, reginaldo).
+job(supervisor, sisnando).
+job(chief_supervisor, gertrudes).
+job(secretary, felismina).
+job(director, asdrubal).
+supervised_by(technician, engineer).
+supervised_by(engineer, supervisor).
+supervised_by(analyst, supervisor).
+supervised_by(supervisor, chief_supervisor).
+supervised_by(chief_supervisor, director).
+supervised_by(secretary, director).
+
+/*
+Without using the interpreter, describe in natural language the following queries:
+i.      | ?- supervised_by(analyst, _X), job(_X, sisnando).
+    Qual o trabalho do Sisnando que supervisiona o analista?
+    -> _X = supervisor ?
+ii.     | ?- supervised_by(technician, _X), supervised_by(_X, Y).
+    Qual o trabalho que supervisiona o Técnico e qual a função de quem supervisiona o supervisor do técnico?
+    -> _X = engineer,
+        Y = supervisor ?
+iii.    | ?- job(J, P), supervised_by(J, supervisor).
+    Qual o trabalho da pessoa que é supervisionada pelo supervisor e que pessoas tem esse cargo?
+    -> J = engineer,
+       P = osvaldo ?
+iv.     | ?- job(_J, asdrubal), supervised_by(_S, _J), job(_S, P).
+    Qual o trabalho do asdrubal, que cargos ele supervisiona e quem são as pessoas que trabalham nesse cargo?
+    -> _J = director,
+       _S = chief_supervisor,
+       P  = gertrudes ?
+
+Without using the interpreter, state with would be the first answer given by Prolog for each
+of the queries above. Confirm with the interpreter.
+
+Write rules that allow answering the following questions:
+i. Is X a direct supervisor of Y?
+ii. Are X and Y supervised by people with the same job?
+iii. Is X responsible for supervising more than one job?
+iv. Is X a supervisor of Y’s supervisor?
+*/
+
+% Is X a direct supervisor of Y?
+
+direct_Supervisor(PessoaA,PessoaB):-
+    job(TrabalhoA,PessoaA),
+    job(TrabalhoB,PessoaB),
+    supervised_by(TrabalhoB,TrabalhoA).
+
+% Are X and Y supervised by people with the same job?
+
+common_Supervisor_Job(PessoaA,PessoaB):-
+    job(TrabalhoA,PessoaA),
+    job(TrabalhoB,PessoaB),
+    supervised_by(TrabalhoA,TrabalhoC),
+    supervised_by(TrabalhoB,TrabalhoC).
+
+% Is X responsible for supervising more than one job?
+
+supervising_More(PessoaA):-
+    job(TrabalhoA,PessoaA),
+    supervised_by(SupervisionadoA,TrabalhoA),
+    supervised_by(SupervisionadoB,TrabalhoA),
+    dif(SupervisionadoA,SupervisionadoB).
+
+% Is X a supervisor of Y’s supervisor?
+
+superior_Supervisor(PessoaA,PessoaB):-
+    job(TrabalhoA,PessoaA),
+    job(TrabalhoB,PessoaB),
+    supervised_by(TrabalhoB,TrabalhoC),
+    supervised_by(TrabalhoC,TrabalhoA).
+
