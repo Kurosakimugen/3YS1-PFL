@@ -144,9 +144,7 @@ best_score(Constraints, 0):-                        % Caso onde dão um board po
 
 best_score(Constraints,Score):-                     % Caso geral
     board(Board),                                   % Gerar cada board possível para posteriormente ser avaliado
-    best_score_stack(Constraints,Score,0,Board),    % Chamar a função auxiliar que calcula a stack com a quantidade de constraint que falham
-    best_score_rest(Constraints, Score, BestScore).
-
+    best_score_stack(Constraints,Score,0,Board).    % Chamar a função auxiliar que calcula a stack com a quantidade de constraint que falham
 
 best_score_stack([],Stack,Stack,_).                 % Caso base da função auxiliar
 best_score_stack([CH|CT],Score,Stack,Board):-       % Caso geral da função auxiliar
