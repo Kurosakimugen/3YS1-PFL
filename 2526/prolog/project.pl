@@ -13,7 +13,7 @@ nth1(1, [H|_], H).
 nth1(N, [_|T], X) :-
     nth1(N1, T, X),
     N is N1 + 1.
- 
+
 /*
 Versão tail recursion
 nth1(1, [H|_], H).
@@ -23,6 +23,17 @@ nth1(N, [_|T], X) :-
     N1 is N - 1,
     nth1(N1, T, X).
 */
+
+max_list([X], X).
+max_list([H|T], Max):-
+    max_list(T, MaxT),
+    (
+        H > MaxT
+    ->
+        Max = H
+    ;
+        Max = MaxT
+    ).
 
 % Cor dos tokens
 colors([green,yellow,blue,orange,white,black]).
@@ -38,9 +49,11 @@ board(Board) :-
 
 /*
 Funções úteis
-nth1(Pos, List, Elem)   Serve para determinar a posição de um elemento ou saber que elemento está na posição
-member(Elem, List)      Serve para verificar se um certo elemento existe na lista desconsiderando a posição
-append(L1,L2,L3)        Serve para unir duas listas ou para verificar se é possível criar uma separação de listas tal que L1+L2 dê sempre o L3
+nth1(Pos, List, Elem)       Serve para determinar a posição de um elemento ou saber que elemento está na posição
+member(Elem, List)          Serve para verificar se um certo elemento existe na lista desconsiderando a posição
+append(L1,L2,L3)            Serve para unir duas listas ou para verificar se é possível criar uma separação de listas tal que L1+L2 dê sempre o L3
+findall(Template,Goal,List) Serve para processar o resultado de uma função e guardar cada resultado numa lista (Template define o que guardar do goal para ficar preservado,Goal é o metodo a ser utilizado para avaliar, List é onde fica guardado o resultado)
+max_list(List,Max)          Serve para obter o maior valor de uma lista
 */
 
 % X pode estar em qualquer posição.
@@ -142,9 +155,16 @@ best_score(Constraints, 0):-                        % Caso onde dão um board po
     solve(Constraints,Board),                       % Deu uma solução aqui logo é um caso onde existe board que satifasça as constraint todas
     !.                                              % Manda parar para não gerar todas as respostas
 
-best_score(Constraints,Score):-                     % Caso geral
-    board(Board),                                   % Gerar cada board possível para posteriormente ser avaliado
-    best_score_stack(Constraints,Score,0,Board).    % Chamar a função auxiliar que calcula a stack com a quantidade de constraint que falham
+best_score(Constraints, BestScore):-
+    findall(                                        % Chama o findall para obter todos os resultados possiveis sobre as constraints
+        Score,
+        (
+            board(Board),
+            best_score_stack(Constraints, Score, 0, Board)
+        ),
+        Scores
+    ),
+    max_list(Scores, BestScore).                    % Escolhe o melhor resultado da lista de resultados (No caso o valor mais próximo de 0)
 
 best_score_stack([],Stack,Stack,_).                 % Caso base da função auxiliar
 best_score_stack([CH|CT],Score,Stack,Board):-       % Caso geral da função auxiliar
